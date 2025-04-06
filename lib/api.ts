@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api'; // Update this with your Django backend URL
+const API_BASE_URL = 'http://localhost:8000/accounts'; // Update this with your Django backend URL
 
 export interface LoginCredentials {
     username: string;
@@ -9,7 +9,7 @@ export interface RegisterData {
     username: string;
     email: string;
     password: string;
-    confirm_password: string;
+    // confirm_password: string;   // ADD CHECK IF PASSWORDS MATCH
 }
 
 export const authService = {
@@ -38,6 +38,7 @@ export const authService = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(userData),
+        
         });
 
         if (!response.ok) {
