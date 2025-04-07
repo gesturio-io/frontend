@@ -68,13 +68,13 @@ export const authService = {
         return data;
     },
 
-    async resendOTP(email: string) {
+    async resendOTP(id: string) {
         const response = await fetch(`${API_BASE_URL}/request-verifyemail/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ id }),
         });
 
         if (!response.ok) {
