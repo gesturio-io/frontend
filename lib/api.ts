@@ -19,7 +19,6 @@ export const authService = {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify(credentials),
         });
 
@@ -38,7 +37,6 @@ export const authService = {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify(userData),
         
         });
@@ -46,6 +44,24 @@ export const authService = {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.message || 'Registration failed');
+        }
+
+        const data = await response.json();
+        return data;
+    },
+
+    async verifyEmail(email: string, otp: string) {
+        const response = await fetch(`${API_BASE_URL}/verifyemail/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, otp }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Email verification failed');
         }
 
         const data = await response.json();
