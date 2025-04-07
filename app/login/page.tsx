@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authService } from '@/lib/api';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Mail, Lock, User, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User, CheckCircle2, RefreshCw } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,9 +19,6 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [otpAttempts, setOtpAttempts] = useState(0);
-  const [canResend, setCanResend] = useState(true);
 
   // Add effect to send OTP when verification UI is shown
   useEffect(() => {
@@ -29,16 +26,6 @@ export default function LoginPage() {
       handleResendOTP();
     }
   }, [showOTP, email]);
-
-  // Countdown timer effect
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -84,30 +71,14 @@ export default function LoginPage() {
   }
 
   async function handleResendOTP() {
-    if (!canResend) {
-      setError(`Please wait ${timeLeft} seconds before requesting another code`);
-      return;
-    }
-
     setError('');
     setResending(true);
 
     try {
       await authService.resendOTP(email);
       setError('New verification code sent to your email');
-      setTimeLeft(60); // 1 minute cooldown
-      setCanResend(false);
-      setOtpAttempts(prev => prev + 1);
-    } catch (err: any) {
-      if (err.message?.includes('Email already verified')) {
-        setError('This email is already verified. Please log in.');
-        setShowOTP(false);
-      } else if (err.message?.includes('Daily OTP limit exceeded')) {
-        setError('You have reached the daily limit for OTP requests. Please try again tomorrow.');
-        setCanResend(false);
-      } else {
-        setError(err instanceof Error ? err.message : 'Failed to resend verification code');
-      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to resend verification code');
     } finally {
       setResending(false);
     }
@@ -184,11 +155,6 @@ export default function LoginPage() {
                   Please enter the 6-digit verification code sent to
                   <span className="font-medium text-foreground"> {email}</span>
                 </p>
-                {otpAttempts > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Attempt {otpAttempts}/5
-                  </p>
-                )}
               </div>
               <div className="flex justify-center">
                 <InputOTP
@@ -214,12 +180,11 @@ export default function LoginPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleResendOTP}
-                  disabled={resending || !canResend}
+                  disabled={resending}
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   <RefreshCw className={`mr-2 h-4 w-4 ${resending ? 'animate-spin' : ''}`} />
                   {resending ? 'Sending...' : 'Resend verification code'}
-                  {timeLeft > 0 && ` (${timeLeft}s)`}
                 </Button>
               </div>
             </div>
