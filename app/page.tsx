@@ -1,57 +1,11 @@
+import { Header } from "./components/Header"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-          <div className="flex items-center gap-2 font-bold">
-            <span className="size-8 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
-              G
-            </span>
-            <span>Gesturio</span>
-          </div>
-          <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
-              Features
-            </Link>
-            <Link href="#testimonials" className="text-sm font-medium hover:underline underline-offset-4">
-              Testimonials
-            </Link>
-            <Link href="#pricing" className="text-sm font-medium hover:underline underline-offset-4">
-              Pricing
-            </Link>
-          </nav>
-          <div className="ml-4 flex items-center gap-2">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/dashboard/profile">
-              <Button variant="ghost" size="sm">
-                Profile
-              </Button>
-            </Link>
-            <Link href="/dashboard/test">
-              <Button variant="ghost" size="sm">
-                Test
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" size="sm">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="outline" size="sm">
-                Sign up
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
