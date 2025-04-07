@@ -104,6 +104,26 @@ export default function LoginPage() {
         {!showOTP ? (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full transition-all duration-200 hover:scale-[1.02]"
+              >
+                <Mail className="mr-2 h-5 w-5 text-[#4285F4]" />
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="username" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -139,9 +159,9 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full transition-all duration-200 hover:scale-[1.02]" 
+            <Button
+              type="submit"
+              className="w-full transition-all duration-200 hover:scale-[1.02]"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign in'}
@@ -165,8 +185,8 @@ export default function LoginPage() {
                 >
                   <InputOTPGroup>
                     {[...Array(6)].map((_, index) => (
-                      <InputOTPSlot 
-                        key={index} 
+                      <InputOTPSlot
+                        key={index}
                         index={index}
                         className="h-12 w-12 text-lg font-semibold"
                       />
@@ -190,18 +210,17 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className={`rounded-md p-3 text-sm ${
-                error.includes('New verification code') 
-                  ? 'bg-primary/10 text-primary' 
-                  : 'bg-destructive/10 text-destructive'
-              }`}>
+              <div className={`rounded-md p-3 text-sm ${error.includes('New verification code')
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
+                }`}>
                 {error}
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full transition-all duration-200 hover:scale-[1.02]" 
+            <Button
+              type="submit"
+              className="w-full transition-all duration-200 hover:scale-[1.02]"
               disabled={verifying}
             >
               {verifying ? 'Verifying...' : 'Verify Email'}
@@ -211,8 +230,8 @@ export default function LoginPage() {
 
         <div className="text-center text-sm">
           Don't have an account?{' '}
-          <Link 
-            href="/register" 
+          <Link
+            href="/register"
             className="font-medium text-primary hover:underline"
           >
             Sign up
