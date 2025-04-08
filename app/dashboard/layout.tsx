@@ -3,7 +3,7 @@
 import type React from "react"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Sidebar,
@@ -18,12 +18,23 @@ import {
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BarChart3, BookOpen, Camera, ClipboardCheck, Home, LogOut, Settings, User } from "lucide-react"
+import { authService } from "@/lib/api"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
 
   const isActive = (path: string) => {
     return pathname === path
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      router.push('/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   return (
@@ -111,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <div className="text-muted-foreground">john@example.com</div>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
                   <LogOut className="h-5 w-5" />
                   <span className="sr-only">Log out</span>
                 </Button>

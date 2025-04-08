@@ -18,6 +18,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,7 +37,6 @@ export default function RegisterPage() {
       const response = await authService.register(userData);
       setEmail(userData.email);
       setShowOTP(true);
-      localStorage.setItem('token', response.token);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -56,6 +56,19 @@ export default function RegisterPage() {
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
       setVerifying(false);
+    }
+  }
+
+  async function handleGoogleAuth() {
+    setError('');
+    setGoogleLoading(true);
+
+    try {
+      // Direct browser redirect to backend's Google OAuth URL
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/accounts/google/login/`;
+    } catch (err) {
+      setError('Failed to redirect to Google login');
+      setGoogleLoading(false);
     }
   }
 
@@ -79,26 +92,6 @@ export default function RegisterPage() {
         {!showOTP ? (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full transition-all duration-200 hover:scale-[1.02]"
-              >
-                <Mail className="mr-2 h-5 w-5 text-[#4285F4]" />
-                Continue with Google
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="username" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -168,6 +161,28 @@ export default function RegisterPage() {
               disabled={loading}
             >
               {loading ? 'Creating account...' : 'Create account'}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full transition-all duration-200 hover:scale-[1.02]"
+              onClick={handleGoogleAuth}
+              disabled={googleLoading}
+            >
+              <Mail className="mr-2 h-5 w-5 text-[#4285F4]" />
+              {googleLoading ? 'Redirecting...' : 'Continue with Google'}
             </Button>
           </form>
         ) : (
