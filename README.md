@@ -48,7 +48,7 @@ Before you begin, ensure you have the following installed:
    pnpm dev
    ```
 
-   The application will be available at [http://localhost:3000](http://localhost:3000)
+   The application will be available at [http://127.0.0.1:3000](http://127.0.0.1:3000)
 
 ## Available Scripts
 

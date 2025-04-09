@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/accounts'; // Update this with your Django backend URL
+const API_BASE_URL = 'http://127.0.0.1:8000/accounts'; // Update this with your Django backend URL
 
 export interface LoginCredentials {
     username: string;
@@ -20,6 +20,7 @@ export const authService = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(credentials),
+            credentials: 'include', // This is important for handling cookies
         });
 
         if (!response.ok) {
@@ -38,7 +39,7 @@ export const authService = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(userData),
-        
+            credentials: 'include', // This is important for handling cookies
         });
 
         if (!response.ok) {
@@ -57,6 +58,7 @@ export const authService = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, otp }),
+            credentials: 'include', // This is important for handling cookies
         });
 
         if (!response.ok) {
@@ -75,6 +77,7 @@ export const authService = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ id }),
+            credentials: 'include', // This is important for handling cookies
         });
 
         if (!response.ok) {
@@ -85,4 +88,19 @@ export const authService = {
         const data = await response.json();
         return data;
     },
+
+    async logout() {
+        const response = await fetch(`${API_BASE_URL}/logout/`, {
+            method: 'POST',
+            credentials: 'include', // This is important for handling cookies
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Logout failed');
+        }
+
+        const data = await response.json();
+        return data;
+    }
 }; 
