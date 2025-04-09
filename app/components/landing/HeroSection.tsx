@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { images } from "@/app/Images/images"
 
 export const HeroSection = () => {
     return (
@@ -31,14 +30,16 @@ export const HeroSection = () => {
                             </Link>
                         </div>
                     </div>
-                    <Image
-                        src="/placeholder.svg?height=550&width=550"
-                        width={550}
-                        height={550}
-                        alt="Person demonstrating sign language"
-                        className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-                        priority
-                    />
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl lg:order-last">
+                        <Image
+                            src="/landing_page_img.webp"
+                            alt="Person demonstrating sign language"
+                            fill
+                            className="object-cover"
+                            priority
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                        />
+                    </div>
                 </div>
             </div>
         </section>

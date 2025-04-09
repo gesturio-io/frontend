@@ -7,8 +7,52 @@ import { Menu, X } from "lucide-react"
 import Image from "next/image"
 import { images } from "../Images/images"
 
-export function Header() {
+interface HeaderProps {
+    showNavLinks?: boolean;
+}
+
+export function Header({ showNavLinks = true }: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+    const navigationLinks = showNavLinks ? (
+        <>
+            <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
+                Features
+            </Link>
+            <Link href="#testimonials" className="text-sm font-medium hover:underline underline-offset-4">
+                Testimonials
+            </Link>
+            <Link href="#pricing" className="text-sm font-medium hover:underline underline-offset-4">
+                Pricing
+            </Link>
+        </>
+    ) : null;
+
+    const mobileNavigationLinks = showNavLinks ? (
+        <>
+            <Link
+                href="#features"
+                className="text-sm font-medium hover:underline underline-offset-4"
+                onClick={() => setIsMenuOpen(false)}
+            >
+                Features
+            </Link>
+            <Link
+                href="#testimonials"
+                className="text-sm font-medium hover:underline underline-offset-4"
+                onClick={() => setIsMenuOpen(false)}
+            >
+                Testimonials
+            </Link>
+            <Link
+                href="#pricing"
+                className="text-sm font-medium hover:underline underline-offset-4"
+                onClick={() => setIsMenuOpen(false)}
+            >
+                Pricing
+            </Link>
+        </>
+    ) : null;
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -28,20 +72,7 @@ export function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-6">
-                    <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
-                        Features
-                    </Link>
-                    <Link href="#testimonials" className="text-sm font-medium hover:underline underline-offset-4">
-                        Testimonials
-                    </Link>
-                    <Link href="#pricing" className="text-sm font-medium hover:underline underline-offset-4">
-                        Pricing
-                    </Link>
-                    {/* <Link href="/dashboard">
-                        <Button variant="ghost" size="sm">
-                            Dashboard
-                        </Button>
-                    </Link> */}
+                    {navigationLinks}
                 </nav>
                 <div className="hidden md:flex items-center gap-4">
                     <Link href="/login">
@@ -71,32 +102,7 @@ export function Header() {
                 <div className="md:hidden border-t">
                     <div className="container py-4 space-y-6">
                         <nav className="flex flex-col gap-6">
-                            <Link
-                                href="#features"
-                                className="text-sm font-medium hover:underline underline-offset-4"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Features
-                            </Link>
-                            <Link
-                                href="#testimonials"
-                                className="text-sm font-medium hover:underline underline-offset-4"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Testimonials
-                            </Link>
-                            <Link
-                                href="#pricing"
-                                className="text-sm font-medium hover:underline underline-offset-4"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Pricing
-                            </Link>
-                            {/* <Link href="/dashboard">
-                                <Button variant="ghost" className="w-full justify-start">
-                                    Dashboard
-                                </Button>
-                            </Link> */}
+                            {mobileNavigationLinks}
                         </nav>
                         <div className="flex flex-col gap-4 pt-6 border-t">
                             <Link href="/login">

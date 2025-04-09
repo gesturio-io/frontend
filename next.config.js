@@ -14,6 +14,15 @@ const nextConfig = {
   },
   images: {
     domains: ['127.0.0.1'],
+    formats: ['image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '3000',
+        pathname: '/**',
+      },
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true,

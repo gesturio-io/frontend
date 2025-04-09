@@ -3,6 +3,7 @@
 import type React from "react"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BarChart3, BookOpen, Camera, ClipboardCheck, Home, LogOut, Settings, User } from "lucide-react"
 import { authService } from "@/lib/api"
+import { images } from "@/app/Images/images"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -43,9 +45,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar className="w-64 border-r">
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-3 px-4 py-4">
-              <span className="size-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
-                G
-              </span>
+              <Image
+                src={images.mainLogo}
+                alt="Gesturio Logo"
+                width={36}
+                height={36}
+                className="rounded-full"
+              />
               <span className="text-lg font-bold">Gesturio</span>
             </Link>
           </SidebarHeader>
@@ -111,21 +117,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </SidebarContent>
           <SidebarFooter>
             <div className="border-t p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div className="text-sm">
-                    <div className="font-medium">John Doe</div>
-                    <div className="text-muted-foreground">john@example.com</div>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                  <AvatarFallback>JD</AvatarFallback>
+                </Avatar>
+                <div className="text-sm">
+                  <div className="font-medium">John Doe</div>
+                  <div className="text-muted-foreground">john@example.com</div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
-                  <LogOut className="h-5 w-5" />
-                  <span className="sr-only">Log out</span>
-                </Button>
               </div>
             </div>
           </SidebarFooter>
@@ -134,7 +134,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
             <SidebarTrigger />
             <div className="flex items-center gap-4">
-              <Button>Continue Learning</Button>
+              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
+                <LogOut className="h-5 w-5" />
+                <span className="sr-only">Log out</span>
+              </Button>
             </div>
           </header>
           <main className="flex-1 overflow-auto p-8">{children}</main>
