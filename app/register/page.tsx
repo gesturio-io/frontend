@@ -84,7 +84,7 @@ export default function RegisterPage() {
 
   async function handleResendOTP() {
     if (countdown > 0) return;
-    
+
     setError('');
     try {
       await authService.resendOTP(email);
@@ -179,11 +179,10 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className={`rounded-md p-3 text-sm ${
-                error.includes('New verification code sent')
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-destructive/10 text-destructive'
-              }`}>
+              <div className={`rounded-md p-3 text-sm ${error.includes('New verification code sent')
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
+                }`}>
                 {error}
               </div>
             )}
@@ -248,11 +247,10 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className={`rounded-md p-3 text-sm ${
-                error.includes('New verification code sent')
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-destructive/10 text-destructive'
-              }`}>
+              <div className={`rounded-md p-3 text-sm ${error.includes('New verification code sent')
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
+                }`}>
                 {error}
               </div>
             )}

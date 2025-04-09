@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { images } from "@/app/Images/images"
 
 export const HeroSection = () => {
     return (
@@ -32,7 +33,7 @@ export const HeroSection = () => {
                     </div>
                     <div className="relative aspect-video w-full overflow-hidden rounded-xl lg:order-last">
                         <Image
-                            src="/landing_page_img.webp"
+                            src={images.learnSvg}
                             alt="Person demonstrating sign language"
                             fill
                             className="object-cover"

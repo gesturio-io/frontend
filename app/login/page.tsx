@@ -95,7 +95,7 @@ export default function LoginPage() {
 
   async function handleResendOTP() {
     if (countdown > 0) return;
-    
+
     setError('');
     try {
       await authService.resendOTP(email);
@@ -162,11 +162,10 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className={`rounded-md p-3 text-sm ${
-                error.includes('New verification code sent')
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-destructive/10 text-destructive'
-              }`}>
+              <div className={`rounded-md p-3 text-sm ${error.includes('New verification code sent')
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
+                }`}>
                 {error}
               </div>
             )}
@@ -178,7 +177,7 @@ export default function LoginPage() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
-            
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -189,7 +188,7 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            
+
             <Button
               type="button"
               variant="outline"
@@ -231,11 +230,10 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className={`rounded-md p-3 text-sm ${
-                error.includes('New verification code sent')
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-destructive/10 text-destructive'
-              }`}>
+              <div className={`rounded-md p-3 text-sm ${error.includes('New verification code sent')
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
+                }`}>
                 {error}
               </div>
             )}
