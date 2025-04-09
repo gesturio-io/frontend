@@ -27,10 +27,10 @@ export default function Home() {
             &copy; {new Date().getFullYear()} Gesturio. All rights reserved.
           </p>
           <div className="flex gap-4">
-            <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+            <Link href="/terms" className="text-sm font-medium hover:underline underline-offset-4">
               Terms
             </Link>
-            <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+            <Link href="/privacy" className="text-sm font-medium hover:underline underline-offset-4">
               Privacy
             </Link>
           </div>

@@ -32,21 +32,21 @@ export default function DashboardPage() {
       title: "Basic Greetings",
       description: "Learn common greeting signs",
       progress: 60,
-      image: "/placeholder.svg?height=160&width=320",
+      image: "/basic_greetings_img.png",
     },
     {
       id: "numbers-counting",
       title: "Numbers & Counting",
       description: "Master numbers from 1-20",
       progress: 35,
-      image: "/placeholder.svg?height=160&width=320",
+      image: "/numbers_img.png",
     },
     {
       id: "common-phrases",
       title: "Common Phrases",
       description: "Everyday useful expressions",
       progress: 15,
-      image: "/placeholder.svg?height=160&width=320",
+      image: "/common_signs.png",
     },
   ]
 

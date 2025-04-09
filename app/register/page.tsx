@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authService } from '@/lib/api';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Mail, Lock, User, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, CheckCircle2, RefreshCw } from 'lucide-react';
+import { images } from '@/app/Images/images';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +21,14 @@ export default function RegisterPage() {
   const [otp, setOtp] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,12 +82,31 @@ export default function RegisterPage() {
     }
   }
 
+  async function handleResendOTP() {
+    if (countdown > 0) return;
+    
+    setError('');
+    try {
+      await authService.resendOTP(email);
+      setCountdown(60); // Start 60-second countdown
+      setError('New verification code sent to your email');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to resend verification code');
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
       <div className="w-full max-w-md space-y-8 rounded-xl border bg-card p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
         <div className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center">
+            <Image
+              src={images.mainLogo}
+              alt="Gesturio Logo"
+              width={64}
+              height={64}
+              className="rounded-full"
+            />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
             {!showOTP ? 'Create an account' : 'Verify your email'}
@@ -150,7 +179,11 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div className={`rounded-md p-3 text-sm ${
+                error.includes('New verification code sent')
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-destructive/10 text-destructive'
+              }`}>
                 {error}
               </div>
             )}
@@ -215,7 +248,11 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div className={`rounded-md p-3 text-sm ${
+                error.includes('New verification code sent')
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-destructive/10 text-destructive'
+              }`}>
                 {error}
               </div>
             )}
@@ -227,6 +264,20 @@ export default function RegisterPage() {
             >
               {verifying ? 'Verifying...' : 'Verify Email'}
             </Button>
+
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="gap-2"
+                onClick={handleResendOTP}
+                disabled={countdown > 0}
+              >
+                <RefreshCw className={`h-4 w-4 ${countdown > 0 ? '' : 'animate-spin'}`} />
+                {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend code'}
+              </Button>
+            </div>
           </form>
         )}
 
