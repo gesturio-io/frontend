@@ -12,8 +12,30 @@ export interface RegisterData {
     // confirm_password: string;   // ADD CHECK IF PASSWORDS MATCH
 }
 
+interface AuthResponse {
+    id: string;
+    email: string;
+    username: string;
+    login_type: string;
+    isProfileComplete: boolean;
+}
+
+interface ProfileData {
+    firstname: string;
+    lastname: string;
+    bio: string;
+    country: string;
+    native_language: string;
+    gender: string;
+    date_of_birth: string | null;
+    phone_number: string;
+    daily_goal: number;
+    profile_picture: string;
+    requirement: string;
+}
+
 export const authService = {
-    async login(credentials: LoginCredentials) {
+    async login(credentials: LoginCredentials): Promise<AuthResponse> {
         const response = await fetch(`${API_BASE_URL}/login/`, {
             method: 'POST',
             headers: {
@@ -51,7 +73,7 @@ export const authService = {
         return data;
     },
 
-    async verifyEmail(email: string, otp: string) {
+    async verifyEmail(email: string, otp: string): Promise<AuthResponse> {
         const response = await fetch(`${API_BASE_URL}/verifyemail/`, {
             method: 'POST',
             headers: {
@@ -102,5 +124,21 @@ export const authService = {
 
         const data = await response.json();
         return data;
-    }
+    },
+
+    async updateProfile(profileData: ProfileData): Promise<void> {
+        const response = await fetch(`${API_BASE_URL}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(profileData),
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to update profile');
+        }
+    },
 }; 

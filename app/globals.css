@@ -76,3 +76,13 @@
   }
 }
 
+/* Hide sidebar when profile completion form is shown */
+body.hide-sidebar [data-sidebar] {
+  display: none;
+}
+
+body.hide-sidebar main {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+

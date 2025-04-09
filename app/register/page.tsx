@@ -11,6 +11,7 @@ import { authService } from '@/lib/api';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Mail, Lock, User, CheckCircle2, RefreshCw } from 'lucide-react';
 import { images } from '@/app/Images/images';
+import { toast } from 'sonner';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -61,7 +62,8 @@ export default function RegisterPage() {
 
     try {
       await authService.verifyEmail(email, otp);
-      router.push('/dashboard');
+      toast.success('Registration successful! Please login to continue.');
+      router.push('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
