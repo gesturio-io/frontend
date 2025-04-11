@@ -141,4 +141,22 @@ export const authService = {
             throw new Error(error.message || 'Failed to update profile');
         }
     },
+};
+
+export const userService = {
+    async getUserProfile() {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/accounts/update`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user profile');
+        }
+
+        return response.json();
+    },
 }; 
