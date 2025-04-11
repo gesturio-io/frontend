@@ -22,13 +22,34 @@ import { BarChart3, BookOpen, Camera, ClipboardCheck, Home, LogOut, Settings, Us
 import { authService } from "@/lib/api"
 import { images } from "@/app/Images/images"
 import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompletionGuard"
+import { useEffect, useState } from "react"
+import { trackPageVisit } from "@/app/utils/analytics"
+import { requiresAuth } from "@/app/utils/auth"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true when component mounts (client-side only)
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Track page visit when the component mounts or pathname changes
+  useEffect(() => {
+    if (isClient && pathname) {
+      // Add a small delay to ensure the page is fully loaded
+      const timer = setTimeout(() => {
+        trackPageVisit(pathname);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isClient]);
 
   const isActive = (path: string) => {
-    return pathname === path
+    return pathname?.startsWith(path)
   }
 
   const handleLogout = async () => {

@@ -24,6 +24,8 @@ import { format } from 'date-fns';
 import { CalendarIcon, User } from 'lucide-react';
 import { authService } from '@/lib/api';
 import { toast } from 'sonner';
+import Image from 'next/image';
+import { images } from '@/app/Images/images';
 
 interface ProfileFormData {
   firstname: string;
@@ -114,6 +116,16 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Image
+                src={images.mainLogo}
+                alt="Gesturio Logo"
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
+              <span className="text-2xl font-bold">Gesturio</span>
+            </div>
             <h1 className="text-3xl font-bold tracking-tight">Complete Your Profile</h1>
           </div>
 

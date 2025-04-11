@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -18,46 +20,80 @@ import {
   Twitter,
   Users,
 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { fetchHeatmapData } from "@/app/utils/analytics"
+
+type HeatmapData = {
+  date: string;
+  value: number;
+}
 
 export default function ProfilePage() {
-  // Generate more realistic heatmap data with patterns
-  const generateHeatmapData = () => {
-    const today = new Date()
-    const data = []
+  const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadHeatmapData = async () => {
+      try {
+        setIsLoading(true);
+        const result = await fetchHeatmapData();
+        
+        if (result && result.status === 'success' && result.data) {
+          setHeatmapData(result.data);
+        } else {
+          setError('Failed to load heatmap data');
+        }
+      } catch (err) {
+        setError('An error occurred while loading data');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHeatmapData();
+  }, []);
+
+  // Generate placeholder data if backend data is not available
+  const generatePlaceholderData = () => {
+    const today = new Date();
+    const data = [];
 
     // Create a pattern of activity (more active on weekdays, less on weekends)
     for (let i = 0; i < 120; i++) {
-      const date = new Date(today)
-      date.setDate(today.getDate() - i)
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
 
       // Day of week (0 = Sunday, 6 = Saturday)
-      const dayOfWeek = date.getDay()
+      const dayOfWeek = date.getDay();
 
       // More likely to be active on weekdays
-      const isWeekday = dayOfWeek > 0 && dayOfWeek < 6
+      const isWeekday = dayOfWeek > 0 && dayOfWeek < 6;
 
       // Recent days more likely to have activity
-      const recencyFactor = Math.min(1, (120 - i) / 60)
+      const recencyFactor = Math.min(1, (120 - i) / 60);
 
       // Calculate probability of activity
-      let activityProbability = isWeekday ? 0.7 : 0.4
-      activityProbability *= recencyFactor
+      let activityProbability = isWeekday ? 0.7 : 0.4;
+      activityProbability *= recencyFactor;
 
       // Determine activity level (0-4)
-      let value = 0
+      let value = 0;
       if (Math.random() < activityProbability) {
         // More recent days tend to have higher activity
-        const maxValue = Math.ceil(4 * recencyFactor)
-        value = Math.floor(Math.random() * maxValue) + 1
+        const maxValue = Math.ceil(4 * recencyFactor);
+        value = Math.floor(Math.random() * maxValue) + 1;
       }
 
-      data.push({ date: date.toISOString().split("T")[0], value })
+      data.push({ date: date.toISOString().split("T")[0], value });
     }
 
-    return data
-  }
+    return data;
+  };
 
-  const heatmapData = generateHeatmapData()
+  // Use backend data if available, otherwise use placeholder data
+  const displayData = heatmapData.length > 0 ? heatmapData : generatePlaceholderData();
 
   const achievements = [
     {
@@ -288,41 +324,41 @@ export default function ProfilePage() {
               <CardDescription>Your daily learning activity over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-48 rounded-md bg-muted p-4">
-                <div className="grid h-full grid-cols-[repeat(17,1fr)] gap-1">
-                  {Array.from({ length: 17 }).map((_, weekIndex) => (
-                    <div key={weekIndex} className="grid grid-rows-7 gap-1">
+              <div className="h-[200px] rounded-md bg-muted/5 p-6">
+                <div className="grid h-full grid-cols-[repeat(5,1fr)] items-center justify-items-center gap-2">
+                  {Array.from({ length: 5 }).map((_, weekIndex) => (
+                    <div key={weekIndex} className="grid grid-rows-7 gap-2">
                       {Array.from({ length: 7 }).map((_, dayIndex) => {
-                        const dataIndex = weekIndex * 7 + dayIndex
-                        const data = heatmapData[dataIndex]
-                        let bgColor = "bg-muted-foreground/20"
+                        const dataIndex = weekIndex * 7 + dayIndex;
+                        const data = displayData[dataIndex];
+                        let bgColor = "bg-muted-foreground/10";
 
                         if (data && data.value > 0) {
-                          if (data.value === 1) bgColor = "bg-primary/30"
-                          else if (data.value === 2) bgColor = "bg-primary/50"
-                          else if (data.value === 3) bgColor = "bg-primary/70"
-                          else bgColor = "bg-primary"
+                          if (data.value === 1) bgColor = "bg-primary/30 hover:bg-primary/40";
+                          else if (data.value === 2) bgColor = "bg-primary/50 hover:bg-primary/60";
+                          else if (data.value === 3) bgColor = "bg-primary/70 hover:bg-primary/80";
+                          else bgColor = "bg-primary hover:bg-primary/90";
                         }
 
                         return (
                           <div
                             key={dayIndex}
-                            className={`h-3 w-3 rounded-sm ${bgColor}`}
+                            className={`h-4 w-4 rounded-full transition-colors ${bgColor}`}
                             title={data ? `${data.date}: ${data.value} activities` : "No activity"}
                           />
-                        )
+                        );
                       })}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="mt-2 flex items-center justify-end gap-2 text-xs">
+              <div className="mt-4 flex items-center justify-end gap-3 text-xs">
                 <span className="text-muted-foreground">Less</span>
-                <div className="h-3 w-3 rounded-sm bg-muted-foreground/20"></div>
-                <div className="h-3 w-3 rounded-sm bg-primary/30"></div>
-                <div className="h-3 w-3 rounded-sm bg-primary/50"></div>
-                <div className="h-3 w-3 rounded-sm bg-primary/70"></div>
-                <div className="h-3 w-3 rounded-sm bg-primary"></div>
+                <div className="h-4 w-4 rounded-full bg-muted-foreground/10"></div>
+                <div className="h-4 w-4 rounded-full bg-primary/30"></div>
+                <div className="h-4 w-4 rounded-full bg-primary/50"></div>
+                <div className="h-4 w-4 rounded-full bg-primary/70"></div>
+                <div className="h-4 w-4 rounded-full bg-primary"></div>
                 <span className="text-muted-foreground">More</span>
               </div>
             </CardContent>
@@ -381,6 +417,7 @@ export default function ProfilePage() {
                             {!achievement.completed && achievement.progress && ` (${achievement.progress})`}
                           </p>
                         </div>
+
                       </div>
                     ))}
                   </div>

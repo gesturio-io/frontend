@@ -4,6 +4,8 @@ import { FeaturesSection } from "./components/landing/FeaturesSection"
 import { TestimonialsSection } from "./components/landing/TestimonialsSection"
 import { PricingSection } from "./components/landing/PricingSection"
 import Link from "next/link"
+import Image from "next/image"
+import { images } from "./Images/images"
 
 export default function Home() {
   return (
@@ -18,10 +20,16 @@ export default function Home() {
       <footer className="w-full border-t py-6">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2 font-bold">
-            <span className="size-8 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
-              G
-            </span>
-            <span>Gesturio</span>
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src={images.mainLogo}
+                alt="Gesturio Logo"
+                width={32}
+                height={32}
+                className="rounded-full"
+              />
+              <span>Gesturio</span>
+            </Link>
           </div>
           <p className="text-center text-sm text-muted-foreground md:text-left">
             &copy; {new Date().getFullYear()} Gesturio. All rights reserved.

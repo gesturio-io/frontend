@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -12,13 +12,29 @@ import { User, Lock, Mail } from 'lucide-react';
 import { images } from '@/app/Images/images';
 import { ProfileCompletion } from '@/app/components/profile/ProfileCompletion';
 import { toast } from 'sonner';
+import { useUser } from '@/lib/contexts/UserContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { refreshUserProfile } = useUser();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    // Add debugging logs
+    console.log('SearchParams:', Object.fromEntries(searchParams.entries()));
+    const errorParam = searchParams.get('error');
+    console.log('Error param:', errorParam);
+    
+    if (errorParam === 'existing_email') {
+      toast.error("This email is already registered using password based login. Please login with email & password.");
+      // Also set the error state for visibility in the UI
+      setError("This email is already registered using password based login. Please login with email & password.");
+    }
+  }, [searchParams]);
 
   // Function to check profile completion status from cookie
   const checkProfileStatus = () => {
@@ -68,6 +84,7 @@ export default function LoginPage() {
 
     try {
       await authService.login(credentials);
+      await refreshUserProfile(); // Fetch user profile after successful login
       
       // Wait a brief moment for cookies to be set
       setTimeout(() => {
@@ -88,7 +105,10 @@ export default function LoginPage() {
 
   if (showProfileCompletion) {
     console.log('Rendering ProfileCompletion component');
-    return <ProfileCompletion />;
+    return <ProfileCompletion onProfileComplete={() => {
+      setShowProfileCompletion(false);
+      router.push('/dashboard');
+    }} />;
   }
 
   return (

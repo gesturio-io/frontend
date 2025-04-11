@@ -6,9 +6,62 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Award, Calendar, Clock, Flame, HandMetal, TrendingUp } from "lucide-react"
 import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompletionGuard"
+import { useEffect, useState } from "react"
+
+type WeeklyActivity = {
+  date: string
+  day: string
+  has_activity: boolean
+  is_today: boolean
+  is_future: boolean
+}
+
+type DashboardData = {
+  weekly_activity: WeeklyActivity[]
+  current_streak: number
+  daily_goal: number
+}
 
 export default function DashboardPage() {
-  // Dummy data for dashboard
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
+    weekly_activity: [],
+    current_streak: 0,
+    daily_goal: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWeeklyActivity = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/accounts/logs?view=week', {
+          method: 'GET',
+          credentials: 'include', // This ensures cookies are sent with the request
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch weekly activity data');
+        }
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          setDashboardData(result.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred while fetching data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWeeklyActivity();
+  }, []);
+
   const learningStreak = {
     days: 7,
     change: "+2 days compared to last week",
@@ -95,16 +148,6 @@ export default function DashboardPage() {
     },
   ]
 
-  const weeklySchedule = [
-    { day: "Mon", completed: true },
-    { day: "Tue", completed: true },
-    { day: "Wed", completed: true },
-    { day: "Thu", completed: false, isToday: true },
-    { day: "Fri", completed: false },
-    { day: "Sat", completed: false },
-    { day: "Sun", completed: false },
-  ]
-
   return (
     <ProfileCompletionGuard>
       <div className="space-y-8">
@@ -123,25 +166,53 @@ export default function DashboardPage() {
             <CardDescription>Keep your streak going by practicing daily</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-between gap-4">
-              {weeklySchedule.map((day, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div className={`text-sm font-medium ${day.isToday ? "text-primary" : ""}`}>{day.day}</div>
-                  <div
-                    className={`mt-2 flex h-12 w-12 items-center justify-center rounded-full ${
-                      day.completed
-                        ? "bg-primary text-primary-foreground"
-                        : day.isToday
-                          ? "border-2 border-primary"
-                          : "bg-muted"
-                    }`}
-                  >
-                    {day.completed && <Flame className="h-5 w-5" />}
-                    {day.isToday && !day.completed && <span className="h-2 w-2 rounded-full bg-primary"></span>}
+            {isLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center text-red-500 py-4">
+                {error}
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between gap-4">
+                  {dashboardData.weekly_activity.map((day, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <div className={`text-sm font-medium ${day.is_today ? "text-primary" : ""}`}>
+                        {day.day}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                      <div
+                        className={`mt-2 flex h-12 w-12 items-center justify-center rounded-full ${
+                          day.has_activity
+                            ? "bg-primary text-primary-foreground"
+                            : day.is_today
+                              ? "border-2 border-primary"
+                              : day.is_future
+                                ? "bg-muted"
+                                : "bg-muted"
+                        }`}
+                      >
+                        {day.has_activity && <Flame className="h-5 w-5" />}
+                        {day.is_today && !day.has_activity && <span className="h-2 w-2 rounded-full bg-primary"></span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                    <span className="font-medium">Current Streak: {dashboardData.current_streak} days</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Daily Goal: {dashboardData.daily_goal} minutes</span>
                   </div>
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
