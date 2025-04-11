@@ -15,7 +15,7 @@ Before you begin, ensure you have the following installed:
 
    ```bash
    git clone https://github.com/gesturio-io/frontend
-   cd gesturio
+   cd frontend
    ```
 
 2. **Install dependencies**
