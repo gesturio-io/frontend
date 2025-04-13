@@ -41,7 +41,7 @@ export default function ProfilePage() {
       try {
         setIsLoading(true);
         const result = await fetchHeatmapData();
-        
+
         if (result && result.status === 'success' && result.data) {
           setHeatmapData(result.data);
         } else {
@@ -215,9 +215,9 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="flex flex-col items-center text-center pb-6">
               <Avatar className="h-24 w-24 border-4 border-primary/10">
-                <AvatarImage 
-                  src={userProfile?.profile_picture || "/placeholder.svg?height=96&width=96"} 
-                  alt={`${userProfile?.firstname} ${userProfile?.lastname}`} 
+                <AvatarImage
+                  src={userProfile?.profile_picture || "/placeholder.svg?height=96&width=96"}
+                  alt={`${userProfile?.firstname} ${userProfile?.lastname}`}
                 />
                 <AvatarFallback className="text-lg font-semibold">
                   {userProfile ? `${userProfile.firstname[0]}${userProfile.lastname[0]}` : 'U'}
@@ -227,8 +227,8 @@ export default function ProfilePage() {
                 {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : 'Loading...'}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {userProfile?.joined_at 
-                  ? `Joined ${new Date(userProfile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` 
+                {userProfile?.joined_at
+                  ? `Joined ${new Date(userProfile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
                   : 'Join date not available'}
               </p>
 
@@ -421,9 +421,9 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <EditProfileForm 
-        isOpen={showEditForm} 
-        onClose={() => setShowEditForm(false)} 
+      <EditProfileForm
+        isOpen={showEditForm}
+        onClose={() => setShowEditForm(false)}
       />
     </div>
   )

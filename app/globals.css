@@ -71,6 +71,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -85,4 +86,3 @@ body.hide-sidebar main {
   padding-left: 0 !important;
   margin-left: 0 !important;
 }
-

@@ -45,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const timer = setTimeout(() => {
         trackPageVisit(pathname);
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [pathname, isClient]);
