@@ -6,7 +6,8 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Award, Calendar, Clock, Flame, HandMetal, TrendingUp } from "lucide-react"
 import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompletionGuard"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
+import { logsService } from "@/lib/api"
 
 type WeeklyActivity = {
   date: string
@@ -30,23 +31,17 @@ export default function DashboardPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isMounted = useRef(false);
 
   useEffect(() => {
+    // Prevent double fetching in development due to Strict Mode
+    if (isMounted.current) return;
+    isMounted.current = true;
+
     const fetchWeeklyActivity = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/accounts/logs?view=week', {
-          method: 'GET',
-          credentials: 'include', // This ensures cookies are sent with the request
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch weekly activity data');
-        }
-
-        const result = await response.json();
+        setIsLoading(true);
+        const result = await logsService.getWeeklyActivity();
         if (result.status === 'success') {
           setDashboardData(result.data);
         } else {
@@ -60,6 +55,11 @@ export default function DashboardPage() {
     };
 
     fetchWeeklyActivity();
+
+    // Cleanup function
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   const learningStreak = {

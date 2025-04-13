@@ -13,6 +13,9 @@ interface UserProfile {
   date_of_birth: string;
   phone_number: string;
   daily_goal: number;
+  email: string;
+  joined_at: string;
+  native_language: string;
 }
 
 interface UserContextType {

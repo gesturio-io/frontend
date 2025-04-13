@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,15 +14,15 @@ import {
   Clock,
   Edit,
   Flame,
-  Github,
   Globe,
   Mail,
   MapPin,
-  Twitter,
   Users,
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { fetchHeatmapData } from "@/app/utils/analytics"
+import { useUser } from "@/lib/contexts/UserContext"
+import { EditProfileForm } from "@/app/components/profile/EditProfileForm"
 
 type HeatmapData = {
   date: string;
@@ -30,8 +31,10 @@ type HeatmapData = {
 
 export default function ProfilePage() {
   const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
+  const { userProfile, loading } = useUser();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
     const loadHeatmapData = async () => {
@@ -189,50 +192,45 @@ export default function ProfilePage() {
   ]
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+    <div className="container max-w-7xl mx-auto py-8 space-y-6">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
           <p className="text-muted-foreground">View and manage your profile information</p>
         </div>
-        <Button>
+        <Button variant="outline" onClick={() => setShowEditForm(true)}>
           <Edit className="mr-2 h-4 w-4" />
           Edit Profile
         </Button>
       </div>
 
-      {/* Welcome message for demo */}
-      <Card className="bg-primary/5 border-primary/20">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-4">
-            <div className="rounded-full bg-primary/10 p-2">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-medium mb-1">Demo Profile</h3>
-              <p className="text-sm text-muted-foreground">
-                This is a demo profile showing how user progress and achievements are tracked in Gesturio. In a real
-                application, this would display your personal learning journey.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
+      <div className="grid gap-6 lg:grid-cols-[350px_1fr] xl:grid-cols-[380px_1fr_1fr] xl:gap-6">
+        {/* Left Column - Profile Info */}
         <div className="space-y-6">
-          <Card>
+          {/* Profile Card */}
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2">
               <CardTitle>Profile</CardTitle>
               <CardDescription>Your personal information</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center text-center">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src="/placeholder.svg?height=96&width=96" alt="John Doe" />
-                <AvatarFallback>JD</AvatarFallback>
+            <CardContent className="flex flex-col items-center text-center pb-6">
+              <Avatar className="h-24 w-24 border-4 border-primary/10">
+                <AvatarImage 
+                  src={userProfile?.profile_picture || "/placeholder.svg?height=96&width=96"} 
+                  alt={`${userProfile?.firstname} ${userProfile?.lastname}`} 
+                />
+                <AvatarFallback className="text-lg font-semibold">
+                  {userProfile ? `${userProfile.firstname[0]}${userProfile.lastname[0]}` : 'U'}
+                </AvatarFallback>
               </Avatar>
-              <h2 className="mt-4 text-xl font-bold">John Doe</h2>
-              <p className="text-sm text-muted-foreground">Joined April 2023</p>
+              <h2 className="mt-4 text-xl font-bold">
+                {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : 'Loading...'}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {userProfile?.joined_at 
+                  ? `Joined ${new Date(userProfile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` 
+                  : 'Join date not available'}
+              </p>
 
               <div className="mt-4 flex items-center justify-center gap-2">
                 <Badge variant="secondary" className="flex items-center gap-1">
@@ -245,41 +243,35 @@ export default function ProfilePage() {
                 </Badge>
               </div>
 
-              <div className="mt-6 w-full space-y-2 text-left">
+              <div className="mt-6 w-full space-y-3 text-left border-t pt-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>john.doe@example.com</span>
+                  <span className="truncate">{userProfile?.email || 'No email provided'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>San Francisco, CA</span>
+                  <span className="truncate">{userProfile?.country || 'Location not set'}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <span>johndoe.com</span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex gap-2">
-                <Button variant="outline" size="icon">
-                  <Twitter className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Github className="h-4 w-4" />
-                </Button>
+                {userProfile?.bio && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <span className="truncate">{userProfile.bio}</span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
+          {/* Learning Stats Card */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle>Learning Stats</CardTitle>
               <CardDescription>Your progress overview</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-primary/10 p-1">
+                  <div className="rounded-full bg-primary/10 p-1.5">
                     <CheckCircle className="h-4 w-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium">Signs Learned</span>
@@ -288,7 +280,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-primary/10 p-1">
+                  <div className="rounded-full bg-primary/10 p-1.5">
                     <Clock className="h-4 w-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium">Learning Time</span>
@@ -297,7 +289,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-primary/10 p-1">
+                  <div className="rounded-full bg-primary/10 p-1.5">
                     <Calendar className="h-4 w-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium">Days Active</span>
@@ -306,7 +298,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-primary/10 p-1">
+                  <div className="rounded-full bg-primary/10 p-1.5">
                     <Award className="h-4 w-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium">Achievements</span>
@@ -317,14 +309,16 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        {/* Middle Column - Learning Activity */}
+        <div className="xl:space-y-6">
+          {/* Learning Activity Card */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle>Learning Activity</CardTitle>
               <CardDescription>Your daily learning activity over time</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px] rounded-md bg-muted/5 p-6">
+            <CardContent className="pb-6">
+              <div className="h-[300px] rounded-md bg-muted/5 p-6">
                 <div className="grid h-full grid-cols-[repeat(5,1fr)] items-center justify-items-center gap-2">
                   {Array.from({ length: 5 }).map((_, weekIndex) => (
                     <div key={weekIndex} className="grid grid-rows-7 gap-2">
@@ -363,24 +357,28 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <Tabs defaultValue="activity">
-            <TabsList>
-              <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-              <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            </TabsList>
-            <TabsContent value="activity" className="mt-4">
-              <Card>
+        {/* Right Column - Activity & Achievements */}
+        <div className="xl:space-y-6">
+          {/* Activity & Achievements Tabs */}
+          <Card className="h-full">
+            <Tabs defaultValue="activity" className="w-full h-full">
+              <TabsList className="w-full grid grid-cols-2 p-0">
+                <TabsTrigger value="activity" className="rounded-none data-[state=active]:bg-muted/50">Recent Activity</TabsTrigger>
+                <TabsTrigger value="achievements" className="rounded-none data-[state=active]:bg-muted/50">Achievements</TabsTrigger>
+              </TabsList>
+              <TabsContent value="activity" className="m-0 p-0">
                 <CardHeader className="pb-2">
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>Your latest learning activities</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-6">
                   <div className="space-y-4">
                     {recentActivity.map((activity) => (
                       <div key={activity.id} className="flex items-start gap-4">
-                        <div className="rounded-full bg-muted p-2">
-                          <activity.icon className="h-4 w-4" />
+                        <div className="rounded-full bg-primary/10 p-2">
+                          <activity.icon className="h-4 w-4 text-primary" />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium">{activity.title}</p>
@@ -390,25 +388,21 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="achievements" className="mt-4">
-              <Card>
+              </TabsContent>
+              <TabsContent value="achievements" className="m-0 p-0">
                 <CardHeader className="pb-2">
                   <CardTitle>Achievements</CardTitle>
                   <CardDescription>Badges and rewards you've earned</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 sm:grid-cols-2">
+                <CardContent className="pb-6">
+                  <div className="grid gap-4">
                     {achievements.map((achievement) => (
                       <div
                         key={achievement.id}
-                        className={`flex items-center gap-4 rounded-md border p-4 ${!achievement.completed ? "opacity-60" : ""}`}
+                        className={`flex items-center gap-4 rounded-md border p-4 transition-opacity hover:bg-muted/50 ${!achievement.completed ? "opacity-60" : ""}`}
                       >
-                        <div
-                          className={`rounded-full bg-${achievement.color}-100 p-2 text-${achievement.color}-600 dark:bg-${achievement.color}-900 dark:text-${achievement.color}-300`}
-                        >
-                          <achievement.icon className="h-6 w-6" />
+                        <div className="rounded-full bg-primary/10 p-2">
+                          <achievement.icon className="h-6 w-6 text-primary" />
                         </div>
                         <div>
                           <h3 className="font-medium">{achievement.name}</h3>
@@ -417,16 +411,20 @@ export default function ProfilePage() {
                             {!achievement.completed && achievement.progress && ` (${achievement.progress})`}
                           </p>
                         </div>
-
                       </div>
                     ))}
                   </div>
                 </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </Card>
         </div>
       </div>
+
+      <EditProfileForm 
+        isOpen={showEditForm} 
+        onClose={() => setShowEditForm(false)} 
+      />
     </div>
   )
 }

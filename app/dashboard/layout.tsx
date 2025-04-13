@@ -25,10 +25,12 @@ import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompleti
 import { useEffect, useState } from "react"
 import { trackPageVisit } from "@/app/utils/analytics"
 import { requiresAuth } from "@/app/utils/auth"
+import { useUser } from "@/lib/contexts/UserContext"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const router = useRouter()
+  const { userProfile } = useUser();
+  const pathname = usePathname();
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
   // Set isClient to true when component mounts (client-side only)
@@ -48,9 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [pathname, isClient]);
 
-  const isActive = (path: string) => {
-    return pathname?.startsWith(path)
-  }
+  const isActive = (path: string) => pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -66,71 +66,71 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SidebarProvider>
         <div className="flex min-h-screen">
           <Sidebar className="w-64 border-r">
-            <SidebarHeader>
-              <Link href="/" className="flex items-center gap-3 px-4 py-4">
+            <SidebarHeader className="border-b px-6 py-4">
+              <Link href="/" className="flex items-center gap-2">
                 <Image
                   src={images.mainLogo}
                   alt="Gesturio Logo"
-                  width={36}
-                  height={36}
+                  width={32}
+                  height={32}
                   className="rounded-full"
                 />
-                <span className="text-lg font-bold">Gesturio</span>
+                <span className="text-xl font-bold">Gesturio</span>
               </Link>
             </SidebarHeader>
             <SidebarContent className="px-2 py-4">
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard")}>
+                    <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3">
                       <Home className="h-5 w-5" />
                       <span>Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/learn")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/learn">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/learn")}>
+                    <Link href="/dashboard/learn" className="flex items-center gap-3 px-4 py-3">
                       <BookOpen className="h-5 w-5" />
                       <span>Learn</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/practice")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/practice">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/practice")}>
+                    <Link href="/dashboard/practice" className="flex items-center gap-3 px-4 py-3">
                       <Camera className="h-5 w-5" />
                       <span>Practice</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/test")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/test">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/test")}>
+                    <Link href="/dashboard/test" className="flex items-center gap-3 px-4 py-3">
                       <ClipboardCheck className="h-5 w-5" />
                       <span>Test</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/progress")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/progress">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/progress")}>
+                    <Link href="/dashboard/progress" className="flex items-center gap-3 px-4 py-3">
                       <BarChart3 className="h-5 w-5" />
                       <span>Progress</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/profile")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/profile">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/profile")}>
+                    <Link href="/dashboard/profile" className="flex items-center gap-3 px-4 py-3">
                       <User className="h-5 w-5" />
                       <span>Profile</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard/settings")} className="flex items-center gap-3 px-4 py-3 text-base">
-                    <Link href="/dashboard/settings">
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/settings")}>
+                    <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3">
                       <Settings className="h-5 w-5" />
                       <span>Settings</span>
                     </Link>
@@ -138,17 +138,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarContent>
-            <SidebarFooter>
-              <div className="border-t p-4">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div className="text-sm">
-                    <div className="font-medium">John Doe</div>
-                    <div className="text-muted-foreground">john@example.com</div>
-                  </div>
+            <SidebarFooter className="border-t p-4">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage src={userProfile?.profile_picture} />
+                  <AvatarFallback>
+                    {userProfile ? `${userProfile.firstname[0]}${userProfile.lastname[0]}` : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate font-medium">
+                    {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : 'Loading...'}
+                  </span>
+                  <span className="truncate text-sm text-muted-foreground">
+                    {userProfile?.email || 'Loading...'}
+                  </span>
                 </div>
               </div>
             </SidebarFooter>

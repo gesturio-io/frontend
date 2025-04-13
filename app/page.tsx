@@ -6,6 +6,7 @@ import { PricingSection } from "./components/landing/PricingSection"
 import Link from "next/link"
 import Image from "next/image"
 import { images } from "./Images/images"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (

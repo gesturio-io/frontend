@@ -45,6 +45,30 @@ interface ProfileCompletionProps {
   onProfileComplete: () => void;
 }
 
+// Add languages list after the countries array
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'bn', name: 'Bengali' },
+  { code: 'ur', name: 'Urdu' },
+  { code: 'tr', name: 'Turkish' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'th', name: 'Thai' },
+  { code: 'sw', name: 'Swahili' },
+].sort((a, b) => a.name.localeCompare(b.name));
+
 export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -216,10 +240,11 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
                       <SelectValue placeholder="Native Language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
+                      {languages.map((language) => (
+                        <SelectItem key={language.code} value={language.code}>
+                          {language.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <Select onValueChange={(value) => handleInputChange('gender', value)}>

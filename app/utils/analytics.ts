@@ -2,12 +2,30 @@
  * Utility functions for tracking user activity
  */
 
+import { logsService } from '@/lib/api';
+
+// Keep track of last tracked URLs and their timestamps
+const trackedUrls = new Map<string, number>();
+const TRACKING_COOLDOWN = 2000; // 2 seconds cooldown between same URL tracking
+
 /**
  * Tracks a page visit by sending the page URL to the backend
  * @param pageUrl The URL of the page being visited
  */
 export async function trackPageVisit(pageUrl: string): Promise<void> {
   try {
+    // Check if this URL was recently tracked
+    const lastTrackedTime = trackedUrls.get(pageUrl);
+    const now = Date.now();
+    
+    if (lastTrackedTime && now - lastTrackedTime < TRACKING_COOLDOWN) {
+      // Skip if the same URL was tracked recently
+      return;
+    }
+
+    // Update the tracking timestamp before making the request
+    trackedUrls.set(pageUrl, now);
+
     // Ensure the URL is properly formatted
     // If it's just a path (e.g., "/dashboard"), add the origin
     const fullUrl = pageUrl.startsWith('http') 
@@ -15,39 +33,22 @@ export async function trackPageVisit(pageUrl: string): Promise<void> {
       : `${window.location.origin}${pageUrl}`;
     
     // Format date as YYYY-MM-DD as required by the backend
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const day = String(now.getDate()).padStart(2, '0');
+    const now_date = new Date();
+    const year = now_date.getFullYear();
+    const month = String(now_date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now_date.getDate()).padStart(2, '0');
     const visitDate = `${year}-${month}-${day}`;
     
     // Log the URL being sent for debugging
     console.log('Tracking page visit:', fullUrl, 'at', visitDate);
     
-    const response = await fetch('http://127.0.0.1:8000/accounts/logs/', {
-      method: 'POST',
-      credentials: 'include', // This ensures cookies are sent with the request
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        page_url: fullUrl,
-        visit_date: visitDate,
-      }),
-    });
+    await logsService.trackPageVisit(fullUrl, visitDate);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Failed to track page visit:', errorText);
-      
-      // Try to parse the error message for more details
-      try {
-        const errorJson = JSON.parse(errorText);
-        if (errorJson.message && Array.isArray(errorJson.message)) {
-          console.error('Error details:', errorJson.message.join(', '));
-        }
-      } catch (e) {
-        // If parsing fails, just use the raw error text
+    // Clean up old entries from trackedUrls after 1 hour
+    const ONE_HOUR = 3600000;
+    for (const [url, timestamp] of trackedUrls.entries()) {
+      if (now - timestamp > ONE_HOUR) {
+        trackedUrls.delete(url);
       }
     }
   } catch (error) {
@@ -60,23 +61,5 @@ export async function trackPageVisit(pageUrl: string): Promise<void> {
  * @returns Promise with the heatmap data
  */
 export async function fetchHeatmapData(): Promise<any> {
-  try {
-    const response = await fetch('http://127.0.0.1:8000/accounts/logs?view=heatmap', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch heatmap data');
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('Error fetching heatmap data:', error);
-    return null;
-  }
+  return logsService.getHeatmapData();
 } 

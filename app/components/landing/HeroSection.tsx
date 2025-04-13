@@ -19,9 +19,9 @@ export const HeroSection = () => {
                             </p>
                         </div>
                         <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                            <Link href="/dashboard">
+                            <Link href="/demo">
                                 <Button size="lg" className="w-full min-[400px]:w-auto">
-                                    Try Dashboard
+                                    Try Demo
                                 </Button>
                             </Link>
                             <Link href="#pricing">

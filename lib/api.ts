@@ -34,6 +34,76 @@ interface ProfileData {
     requirement: string;
 }
 
+// Cache for weekly activity data
+let weeklyActivityCache: { data: any; timestamp: number } | null = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+export const logsService = {
+    async trackPageVisit(pageUrl: string, visitDate: string): Promise<void> {
+        const response = await fetch(`${API_BASE_URL}/logs/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                page_url: pageUrl,
+                visit_date: visitDate,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to track page visit');
+        }
+    },
+
+    async getWeeklyActivity(): Promise<any> {
+        // Check cache first
+        const now = Date.now();
+        if (weeklyActivityCache && now - weeklyActivityCache.timestamp < CACHE_DURATION) {
+            return weeklyActivityCache.data;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/logs?view=week`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch weekly activity');
+        }
+
+        const data = await response.json();
+        
+        // Update cache
+        weeklyActivityCache = {
+            data,
+            timestamp: now,
+        };
+
+        return data;
+    },
+
+    async getHeatmapData(): Promise<any> {
+        const response = await fetch(`${API_BASE_URL}/logs?view=heatmap`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch heatmap data');
+        }
+
+        return response.json();
+    },
+};
+
 export const authService = {
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         const response = await fetch(`${API_BASE_URL}/login/`, {
