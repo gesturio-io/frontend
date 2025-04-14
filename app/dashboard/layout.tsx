@@ -26,12 +26,19 @@ import { useEffect, useState } from "react"
 import { trackPageVisit } from "@/app/utils/analytics"
 import { requiresAuth } from "@/app/utils/auth"
 import { useUser } from "@/lib/contexts/UserContext"
+import { Search } from "../components/ui/search"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { userProfile } = useUser();
   const pathname = usePathname();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [friends, setFriends] = useState<Array<{ id: string; name: string; avatar?: string; email: string }>>([
+    // Dummy data - replace with actual API call
+    { id: '1', name: 'John Doe', email: 'john@example.com' },
+    { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
+    { id: '3', name: 'Mike Johnson', email: 'mike@example.com' },
+  ]);
 
   // Set isClient to true when component mounts (client-side only)
   useEffect(() => {
@@ -60,6 +67,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       console.error('Logout failed:', error)
     }
   }
+
+  const handleFriendSelect = (friend: { id: string; name: string; avatar?: string; email: string }) => {
+    // Handle friend selection - navigate to profile or show details
+    router.push(`/dashboard/profile/${friend.id}`);
+  };
 
   return (
     <ProfileCompletionGuard>
@@ -161,6 +173,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
               <SidebarTrigger />
               <div className="flex items-center gap-4">
+                <Search friends={friends} onSelect={handleFriendSelect} />
                 <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
                   <LogOut className="h-5 w-5" />
                   <span className="sr-only">Log out</span>

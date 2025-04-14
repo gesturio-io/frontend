@@ -38,11 +38,22 @@ export default function LoginPage() {
 
   // Function to check profile completion status from cookie
   const checkProfileStatus = () => {
-    const isProfileCompleteRaw = document.cookie
+    const cookies = document.cookie;
+    console.log('All cookies:', cookies); // Debug log to see all cookies
+    
+    const isProfileCompleteCookie = cookies
       .split('; ')
-      .find(row => row.startsWith('isProfileComplete='))
-      ?.split('=')[1];
+      .find(row => row.startsWith('isProfileComplete='));
+      
+    console.log('Found cookie:', isProfileCompleteCookie); // Debug log for the specific cookie
+    
+    if (!isProfileCompleteCookie) {
+      console.log('isProfileComplete cookie not found');
+      setShowProfileCompletion(true);
+      return true;
+    }
 
+    const isProfileCompleteRaw = isProfileCompleteCookie.split('=')[1];
     console.log('Cookie value for isProfileComplete:', isProfileCompleteRaw);
 
     // Check if the cookie value is exactly "True" (case-sensitive)
