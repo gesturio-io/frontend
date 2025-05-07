@@ -23,6 +23,12 @@ export default function RegisterPage() {
   const [verifying, setVerifying] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const passwordsMatch = password === confirmPassword;
+  const canSubmit = username && email && password && confirmPassword && passwordsMatch && !loading;
 
   useEffect(() => {
     if (countdown > 0) {
@@ -36,12 +42,11 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
 
-    const formData = new FormData(event.currentTarget);
     const userData = {
-      username: formData.get('username') as string,
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      confirm_password: formData.get('confirm_password') as string,
+      username,
+      email,
+      password,
+      confirm_password: confirmPassword,
     };
 
     try {
@@ -134,6 +139,8 @@ export default function RegisterPage() {
                   placeholder="Choose a username"
                   required
                   className="transition-all duration-200 focus:ring-2"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -148,6 +155,8 @@ export default function RegisterPage() {
                   placeholder="Enter your email"
                   required
                   className="transition-all duration-200 focus:ring-2"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -162,6 +171,8 @@ export default function RegisterPage() {
                   placeholder="Create a password"
                   required
                   className="transition-all duration-200 focus:ring-2"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -176,8 +187,13 @@ export default function RegisterPage() {
                   placeholder="Confirm your password"
                   required
                   className="transition-all duration-200 focus:ring-2"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
                 />
               </div>
+              {!passwordsMatch && confirmPassword && (
+                <div className="text-sm text-destructive">Passwords do not match</div>
+              )}
             </div>
 
             {error && (
@@ -192,7 +208,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full transition-all duration-200 hover:scale-[1.02]"
-              disabled={loading}
+              disabled={!canSubmit}
             >
               {loading ? 'Creating account...' : 'Create account'}
             </Button>

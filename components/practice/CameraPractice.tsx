@@ -9,7 +9,7 @@ export function CameraPractice() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wsRef = useRef<VideoWebSocket | null>(null)
-  const streamFramesRef = useRef<boolean>(false)
+  const streamIntervalRef = useRef<number | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [isFrontCamera, setIsFrontCamera] = useState(true)
 
@@ -27,41 +27,46 @@ export function CameraPractice() {
         // Initialize WebSocket connection
         wsRef.current = new VideoWebSocket()
         await wsRef.current.connect()
-        streamFramesRef.current = true
-        requestAnimationFrame(streamVideoFrame)
+        startFrameStream()
       }
     } catch (err) {
       console.error("Error accessing camera:", err)
     }
   }
 
-  const streamVideoFrame = () => {
-    if (!streamFramesRef.current || !videoRef.current || !canvasRef.current || !wsRef.current) {
-      return;
-    }
+  const startFrameStream = () => {
+    if (!videoRef.current || !canvasRef.current || !wsRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    if (context) {
-      // Set canvas dimensions to match video
+    if (!context) return;
+
+    const setCanvasSize = () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+    };
 
-      // Draw the current video frame
+    video.addEventListener('loadedmetadata', setCanvasSize);
+
+    streamIntervalRef.current = window.setInterval(() => {
+      if (!video.videoWidth || !wsRef.current?.isConnectedAndReady()) {
+        return;
+      }
+
+      if (canvas.width !== video.videoWidth) {
+        setCanvasSize();
+      }
+
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Get the frame data and send it through WebSocket
+      
       canvas.toBlob((blob) => {
-        if (blob && wsRef.current) {
+        if (blob && wsRef.current?.isConnectedAndReady()) {
           wsRef.current.sendFrame(blob);
         }
       }, 'image/jpeg', 0.8);
-    }
-
-    // Continue streaming frames
-    requestAnimationFrame(streamVideoFrame);
+    }, 100);
   };
 
   const stopCamera = () => {
@@ -71,8 +76,11 @@ export function CameraPractice() {
       videoRef.current.srcObject = null
       setIsStreaming(false)
       
-      // Stop streaming frames and disconnect WebSocket
-      streamFramesRef.current = false;
+      if (streamIntervalRef.current) {
+        clearInterval(streamIntervalRef.current);
+        streamIntervalRef.current = null;
+      }
+
       if (wsRef.current) {
         wsRef.current.disconnect();
         wsRef.current = null;
@@ -96,23 +104,24 @@ export function CameraPractice() {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden">
+      <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden group">
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <canvas
           ref={canvasRef}
           className="hidden"
         />
-        <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
             variant="secondary"
             size="icon"
             onClick={() => isStreaming ? stopCamera() : startCamera()}
+            className="hover:bg-primary/10 transition-colors duration-200"
           >
             {isStreaming ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
           </Button>
@@ -121,6 +130,7 @@ export function CameraPractice() {
               variant="secondary"
               size="icon"
               onClick={toggleCamera}
+              className="hover:bg-primary/10 transition-colors duration-200"
             >
               <FlipHorizontal className="h-4 w-4" />
             </Button>

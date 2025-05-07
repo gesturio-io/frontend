@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function SettingsPage() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-8 space-y-6 rounded-lg">
       <h1 className="text-3xl font-bold">Settings</h1>
 
       {/* Account Settings */}
@@ -15,7 +15,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-8">
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <Input id="email" type="email" placeholder="your@email.com" />
@@ -31,9 +31,9 @@ export default function SettingsPage() {
       {/* Notification Preferences */}
       <Card>
         <CardHeader>
-          <CardTitle>Notification Preferences</CardTitle>
+          <CardTitle>Notification Preferences </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-8">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Email Notifications</Label>
@@ -63,7 +63,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Learning Preferences</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-">
           <div className="space-y-2">
             <Label>Preferred Language</Label>
             <Select>
@@ -99,7 +99,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Privacy Settings</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-8">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Profile Visibility</Label>
@@ -129,7 +129,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-red-600">Danger Zone</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-8">
           <div className="space-y-2">
             <Label>Delete Account</Label>
             <p className="text-sm text-gray-500">Permanently delete your account and all associated data</p>

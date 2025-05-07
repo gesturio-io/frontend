@@ -4,10 +4,12 @@ export class VideoWebSocket {
   private isConnected: boolean = false;
   private reconnectAttempts: number = 0;
   private readonly maxReconnectAttempts: number = 5;
+  private lastFrameTime: number = 0;
+  private readonly frameInterval: number = 100; // 100ms = 10fps
   public onMessage: ((data: Blob) => void) | null = null;
 
   constructor() {
-    this.url = `ws://${window.location.hostname}:8000/ws/video/`;
+    this.url = `ws://${window.location.hostname}:8080/ws/video/`;
   }
 
   connect(): Promise<void> {
@@ -37,7 +39,7 @@ export class VideoWebSocket {
         this.ws.onmessage = (event: MessageEvent) => {
           if (event.data instanceof Blob && this.onMessage) {
             this.onMessage(event.data);
-          }
+           }
         };
       } catch (error) {
         reject(error);
@@ -59,7 +61,11 @@ export class VideoWebSocket {
       return;
     }
 
-    this.ws.send(blob);
+    const now = Date.now();
+    if (now - this.lastFrameTime >= this.frameInterval) {
+      this.ws.send(blob);
+      this.lastFrameTime = now;
+    }
   }
 
   isConnectedAndReady(): boolean {

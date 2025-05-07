@@ -23,10 +23,23 @@ import { useEffect, useState } from "react"
 import { fetchHeatmapData } from "@/app/utils/analytics"
 import { useUser } from "@/lib/contexts/UserContext"
 import { EditProfileForm } from "@/app/components/profile/EditProfileForm"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 type HeatmapData = {
   date: string;
   value: number;
+}
+
+interface FriendRequest {
+  id: number;
+  status: string;
+  friend: {
+    username: string;
+    email: string;
+    profile_picture?: string;
+    firstname?: string;
+    lastname?: string;
+  };
 }
 
 export default function ProfilePage() {
@@ -35,6 +48,11 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
+  const [requestActionLoading, setRequestActionLoading] = useState<number | null>(null);
+  const [requestActionError, setRequestActionError] = useState<string | null>(null);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [pendingRejectId, setPendingRejectId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadHeatmapData = async () => {
@@ -56,7 +74,47 @@ export default function ProfilePage() {
     };
 
     loadHeatmapData();
+
+    // Fetch incoming friend requests for the logged-in user
+    async function fetchPendingRequests() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/accounts/addfriend?status=pending`, {
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPendingRequests(data.data?.friends || []);
+        }
+      } catch {
+        setPendingRequests([]);
+      }
+    }
+    fetchPendingRequests();
   }, []);
+
+  // Accept/Reject friend request handlers
+  const handleRequestAction = async (friend_id: number, action: 'accept' | 'reject') => {
+    setRequestActionLoading(friend_id);
+    setRequestActionError(null);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/accounts/addfriend?action=${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ friend_id }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.status !== 'success') {
+        throw new Error(data.message || `Failed to ${action} request`);
+      }
+      // Remove the request from the list
+      setPendingRequests((prev) => prev.filter((req) => req.id !== friend_id));
+    } catch (err: any) {
+      setRequestActionError(err.message || `Failed to ${action} request`);
+    } finally {
+      setRequestActionLoading(null);
+    }
+  };
 
   // Generate placeholder data if backend data is not available
   const generatePlaceholderData = () => {
@@ -419,12 +477,98 @@ export default function ProfilePage() {
             </Tabs>
           </Card>
         </div>
+
+        {/* Friend Requests Card */}{/* Incoming Friend Requests Section */}
+        {pendingRequests.length > 0 && (
+          <div className="w-full mb-8">
+            <h2 className="text-2xl font-bold mb-4">Incoming Friend Requests</h2>
+            <div className="space-y-4">
+              {pendingRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex items-center gap-6 p-4 bg-white dark:bg-muted rounded-xl shadow border"
+                >
+                  <Avatar className="h-14 w-14">
+                    <AvatarImage src={req.friend.profile_picture} />
+                    <AvatarFallback className="text-lg font-bold">
+                      {req.friend.firstname
+                        ? req.friend.firstname[0]
+                        : req.friend.username[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-lg truncate">
+                      {req.friend.firstname && req.friend.lastname
+                        ? `${req.friend.firstname} ${req.friend.lastname}`
+                        : req.friend.username}
+                    </div>
+                    <div className="text-sm text-muted-foreground truncate">
+                      @{req.friend.username}
+                    </div>
+                    <div className="text-sm truncate">{req.friend.email}</div>
+                  </div>
+                  <div className="flex flex-col gap-2 min-w-[120px]">
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      disabled={requestActionLoading === req.id}
+                      onClick={() => handleRequestAction(req.id, "accept")}
+                    >
+                      {requestActionLoading === req.id ? "Accepting..." : "Accept"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="text-white"
+                      disabled={requestActionLoading === req.id}
+                      onClick={() => {
+                        setPendingRejectId(req.id);
+                        setShowRejectDialog(true);
+                      }}
+                    >
+                      {requestActionLoading === req.id ? "Rejecting..." : "Reject"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {requestActionError && (
+              <div className="text-red-500 mt-2">{requestActionError}</div>
+            )}
+          </div>
+        )}
       </div>
 
       <EditProfileForm
         isOpen={showEditForm}
         onClose={() => setShowEditForm(false)}
       />
+
+      {/* Confirmation Dialog for Reject */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you sure you want to reject this friend request?</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (pendingRejectId !== null) {
+                  await handleRequestAction(pendingRejectId, "reject");
+                  setShowRejectDialog(false);
+                  setPendingRejectId(null);
+                }
+              }}
+            >
+              Yes, Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -9,20 +9,52 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 
 interface Friend {
-  id: string
-  name: string
-  avatar?: string
-  email: string
+  user_id: number;
+  firstname: string;
+  lastname: string;
+  profile_picture?: string;
+  username: string;
+  email: string;
 }
 
 interface SearchProps {
-  friends: Friend[]
-  onSelect: (friend: Friend) => void
+  onSelect: (friend: Friend) => void;
 }
 
-export function Search({ friends, onSelect }: SearchProps) {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+export function Search({ onSelect }: SearchProps) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState("");
+  const [results, setResults] = React.useState<Friend[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  // Fetch friends from API as user types
+  React.useEffect(() => {
+    const fetchFriends = async () => {
+      if (!value) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/accounts/search?q=${encodeURIComponent(value)}`,
+        {
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setResults(data);
+        } else {
+          setResults([]);
+        }
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const timeout = setTimeout(fetchFriends, 300); // debounce
+    return () => clearTimeout(timeout);
+  }, [value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -38,35 +70,39 @@ export function Search({ friends, onSelect }: SearchProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
+      <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput placeholder="Search friends..." />
-          <CommandEmpty>No friends found.</CommandEmpty>
+          <CommandInput
+            placeholder="Search friends..."
+            value={value}
+            onValueChange={setValue}
+          />
+          <CommandEmpty>{loading ? 'Searching...' : 'No friends found.'}</CommandEmpty>
           <CommandGroup>
-            {friends.map((friend) => (
+            {results.map((friend) => (
               <CommandItem
-                key={friend.id}
-                value={friend.name}
+                key={friend.user_id}
+                value={friend.username}
                 onSelect={() => {
-                  setValue(friend.name)
-                  onSelect(friend)
-                  setOpen(false)
+                  setValue(friend.username);
+                  onSelect(friend);
+                  setOpen(false);
                 }}
               >
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={friend.avatar} />
-                    <AvatarFallback>{friend.name[0]}</AvatarFallback>
+                    <AvatarImage src={friend.profile_picture} />
+                    <AvatarFallback>{friend.firstname[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span>{friend.name}</span>
+                    <span>{friend.firstname} {friend.lastname} (@{friend.username})</span>
                     <span className="text-xs text-muted-foreground">{friend.email}</span>
                   </div>
                 </div>
                 <Check
                   className={cn(
                     "ml-auto h-4 w-4",
-                    value === friend.name ? "opacity-100" : "opacity-0"
+                    value === friend.username ? "opacity-100" : "opacity-0"
                   )}
                 />
               </CommandItem>
@@ -75,5 +111,5 @@ export function Search({ friends, onSelect }: SearchProps) {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 } 

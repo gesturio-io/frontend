@@ -18,7 +18,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { BarChart3, BookOpen, Camera, ClipboardCheck, Home, LogOut, Settings, User } from "lucide-react"
+import { BarChart3, BookOpen, Camera, ClipboardCheck, Home, LogOut, Settings, User, Users } from "lucide-react"
 import { authService } from "@/lib/api"
 import { images } from "@/app/Images/images"
 import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompletionGuard"
@@ -33,12 +33,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const [friends, setFriends] = useState<Array<{ id: string; name: string; avatar?: string; email: string }>>([
-    // Dummy data - replace with actual API call
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-    { id: '3', name: 'Mike Johnson', email: 'mike@example.com' },
-  ]);
 
   // Set isClient to true when component mounts (client-side only)
   useEffect(() => {
@@ -68,9 +62,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }
 
-  const handleFriendSelect = (friend: { id: string; name: string; avatar?: string; email: string }) => {
-    // Handle friend selection - navigate to profile or show details
-    router.push(`/dashboard/profile/${friend.id}`);
+  interface Friend {
+    user_id: number;
+    firstname: string;
+    lastname: string;
+    profile_picture?: string;
+    username: string;
+    email: string;
+  }
+  const handleFriendSelect = (friend: Friend) => {
+    router.push(`/dashboard/profile/${friend.user_id}`);
   };
 
   return (
@@ -133,6 +134,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/dashboard/friends")}>
+                    <Link href="/dashboard/friends" className="flex items-center gap-3 px-4 py-3">
+                      <Users className="h-5 w-5" />
+                      <span>Friends</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard/profile")}>
                     <Link href="/dashboard/profile" className="flex items-center gap-3 px-4 py-3">
                       <User className="h-5 w-5" />
@@ -173,7 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
               <SidebarTrigger />
               <div className="flex items-center gap-4">
-                <Search friends={friends} onSelect={handleFriendSelect} />
+                <Search onSelect={handleFriendSelect} />
                 <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
                   <LogOut className="h-5 w-5" />
                   <span className="sr-only">Log out</span>
@@ -185,6 +194,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </SidebarProvider>
     </ProfileCompletionGuard>
-  )
+  );
 }
-

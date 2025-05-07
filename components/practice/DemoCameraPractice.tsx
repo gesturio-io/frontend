@@ -211,21 +211,20 @@ export function DemoCameraPractice() {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden">
+      <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden group">
         <div className="relative w-full h-full">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className={`w-full h-full object-cover ${isStreaming ? 'absolute' : ''}`}
+            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${isStreaming ? 'absolute' : ''}`}
           />
           <img
             ref={processedImageRef}
             alt="Processed video feed"
-            className={`w-full h-full object-cover ${isStreaming ? 'absolute inset-0' : 'hidden'}`}
+            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${isStreaming ? 'absolute inset-0' : 'hidden'}`}
             onError={() => {
-              // Clean up resources if image fails to load
               cleanupCurrentFrame();
             }}
           />
@@ -239,12 +238,13 @@ export function DemoCameraPractice() {
             Faces detected: {facesDetected}
           </div>
         )}
-        <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
             variant="secondary"
             size="icon"
             onClick={() => isStreaming ? stopCamera() : startCamera()}
             disabled={isConnecting}
+            className="hover:bg-primary/10 transition-colors duration-200"
           >
             {isStreaming ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
           </Button>
@@ -254,6 +254,7 @@ export function DemoCameraPractice() {
               size="icon"
               onClick={switchCameraDirection}
               disabled={isConnecting}
+              className="hover:bg-primary/10 transition-colors duration-200"
             >
               <FlipHorizontal className="h-4 w-4" />
             </Button>

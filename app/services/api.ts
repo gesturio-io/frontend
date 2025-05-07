@@ -42,7 +42,22 @@ export const authService = {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Registration failed');
+            // Try to extract a specific error message
+            let errorMsg = 'Registration failed';
+            if (error) {
+                if (typeof error === 'string') {
+                    errorMsg = error;
+                } else if (error.email && Array.isArray(error.email)) {
+                    errorMsg = error.email[0];
+                } else if (error.username && Array.isArray(error.username)) {
+                    errorMsg = error.username[0];
+                } else if (error.password && Array.isArray(error.password)) {
+                    errorMsg = error.password[0];
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+            }
+            throw new Error(errorMsg);
         }
 
         const data = await response.json();
