@@ -39,41 +39,48 @@ export default function FriendsPage() {
   }, []);
 
   return (
-    <div className="container max-w-3xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Your Friends</h1>
-      {loading ? (
-        <div>Loading...</div>
-      ) : friends.length === 0 ? (
-        <div className="text-muted-foreground">You have no friends yet.</div>
-      ) : (
-        <div className="space-y-4">
-          {friends.map((req) => (
-            <Card key={req.id}>
-              <CardContent className="flex items-center gap-4 p-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={req.friend.profile_picture} />
-                  <AvatarFallback>
-                    {req.friend.firstname
-                      ? req.friend.firstname[0]
-                      : req.friend.username[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-semibold text-lg">
-                    {req.friend.firstname && req.friend.lastname
-                      ? `${req.friend.firstname} ${req.friend.lastname}`
-                      : req.friend.username}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    @{req.friend.username}
-                  </div>
-                  <div className="text-sm">{req.friend.email}</div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="py-8 space-y-6">
+      <div className="container max-w-7xl mx-auto">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b pb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Your Friends</h1>
+            <p className="text-muted-foreground">See and manage your friends</p>
+          </div>
         </div>
-      )}
+        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+          {loading ? (
+            <div className="col-span-full">Loading...</div>
+          ) : friends.length === 0 ? (
+            <div className="col-span-full text-muted-foreground">You have no friends yet.</div>
+          ) : (
+            friends.map((req) => (
+              <Card key={req.id}>
+                <CardContent className="flex items-center gap-4 p-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={req.friend.profile_picture} />
+                    <AvatarFallback>
+                      {req.friend.firstname
+                        ? req.friend.firstname[0]
+                        : req.friend.username[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-semibold text-lg">
+                      {req.friend.firstname && req.friend.lastname
+                        ? `${req.friend.firstname} ${req.friend.lastname}`
+                        : req.friend.username}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      @{req.friend.username}
+                    </div>
+                    <div className="text-sm">{req.friend.email}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 } 

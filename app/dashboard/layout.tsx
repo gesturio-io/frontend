@@ -27,6 +27,8 @@ import { trackPageVisit } from "@/app/utils/analytics"
 import { requiresAuth } from "@/app/utils/auth"
 import { useUser } from "@/lib/contexts/UserContext"
 import { Search } from "../components/ui/search"
+import { useTheme } from "next-themes"
+import { Sun, Moon } from "lucide-react"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { userProfile } = useUser();
@@ -73,6 +75,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleFriendSelect = (friend: Friend) => {
     router.push(`/dashboard/profile/${friend.user_id}`);
   };
+
+  function ThemeToggle() {
+    const { theme, setTheme } = useTheme();
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Toggle theme"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </Button>
+    );
+  }
 
   return (
     <ProfileCompletionGuard>
@@ -183,6 +199,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarTrigger />
               <div className="flex items-center gap-4">
                 <Search onSelect={handleFriendSelect} />
+                <ThemeToggle />
                 <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleLogout}>
                   <LogOut className="h-5 w-5" />
                   <span className="sr-only">Log out</span>
