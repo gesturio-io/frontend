@@ -44,6 +44,37 @@ interface ProfileFormData {
 interface ProfileCompletionProps {
   onProfileComplete: () => void;
 }
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia",
+  "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+  "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
+  "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia",
+  "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China",
+  "Colombia", "Comoros", "Congo (Brazzaville)", "Congo (Kinshasa)", "Costa Rica", "Croatia",
+  "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini",
+  "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana",
+  "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras",
+  "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+  "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait",
+  "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
+  "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+  "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco",
+  "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal",
+  "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea",
+  "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea",
+  "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia",
+  "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
+  "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia",
+  "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands",
+  "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan",
+  "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand",
+  "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan",
+  "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States",
+  "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen",
+  "Zambia", "Zimbabwe"
+].sort();
+
 
 // Add languages list after the countries array
 const languages = [
@@ -136,8 +167,8 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
   };
 
   return (
-    <div className="fixed inset-0 w-full min-h-screen bg-background">
-      <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="fixed inset-0 w-full h-screen overflow-auto bg-background">
+      <div className="flex items-center justify-center min-h-full p-4">
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center space-y-2">
             <div className="flex items-center justify-center gap-2 mb-4">
@@ -185,9 +216,9 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
                     />
                     {formData.profile_picture && (
                       <div className="mt-2">
-                        <img 
-                          src={formData.profile_picture} 
-                          alt="Profile Preview" 
+                        <img
+                          src={formData.profile_picture}
+                          alt="Profile Preview"
                           className="w-20 h-20 rounded-full object-cover border-2 border-primary"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = '/default-avatar.png';
@@ -224,22 +255,26 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
               {currentStep === 2 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Language & Location</h3>
-                  <Select onValueChange={(value) => handleInputChange('country', value)}>
+                  <Select
+                    onValueChange={(value) => handleInputChange('country', value)}
+                    value={formData.country}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Country" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
-                      <SelectItem value="au">Australia</SelectItem>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <Select onValueChange={(value) => handleInputChange('native_language', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Native Language" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       {languages.map((language) => (
                         <SelectItem key={language.code} value={language.code}>
                           {language.name}
@@ -264,7 +299,7 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
               {currentStep === 3 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Goals & Bio</h3>
-                  <Select 
+                  <Select
                     onValueChange={(value) => handleInputChange('requirement', value)}
                   >
                     <SelectTrigger>
@@ -278,7 +313,7 @@ export function ProfileCompletion({ onProfileComplete }: ProfileCompletionProps)
                       <SelectItem value="Work">Work</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select 
+                  <Select
                     onValueChange={(value) => handleInputChange('daily_goal', parseInt(value))}
                     defaultValue="15"
                   >

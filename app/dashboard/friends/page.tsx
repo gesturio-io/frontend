@@ -39,8 +39,8 @@ export default function FriendsPage() {
   }, []);
 
   return (
-    <div className="py-8 space-y-6">
-      <div className="container max-w-7xl mx-auto">
+    <div className="w-full min-h-screen">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b pb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Your Friends</h1>

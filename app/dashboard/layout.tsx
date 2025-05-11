@@ -93,7 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <ProfileCompletionGuard>
       <SidebarProvider>
-        <div className="flex min-h-screen">
+        <div className="w-full flex min-h-screen">
           <Sidebar className="w-64 border-r">
             <SidebarHeader className="border-b px-6 py-4">
               <Link href="/" className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </SidebarFooter>
           </Sidebar>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
               <SidebarTrigger />
               <div className="flex items-center gap-4">
@@ -206,7 +206,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Button>
               </div>
             </header>
-            <main className="flex-1 overflow-auto p-8">{children}</main>
+            <main className="flex-1 overflow-auto p-8 w-full">{children}</main>
           </div>
         </div>
       </SidebarProvider>
