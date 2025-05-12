@@ -15,6 +15,11 @@ interface Lesson {
   duration: string
   progress: number
   image?: string
+  difficulty: 'easy' | 'medium' | 'hard'
+  additionalResources?: {
+    title: string
+    url: string
+  }[]
 }
 
 interface CategoryLessonsPageProps {
@@ -114,7 +119,12 @@ export default function CategoryLessonsPage({ params }: CategoryLessonsPageProps
               />
             </div>
             <CardHeader className="pb-2">
-              <CardTitle>{lesson.title}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>{lesson.title}</CardTitle>
+                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                  {lesson.difficulty || 'easy'}
+                </span>
+              </div>
               <CardDescription>{lesson.description}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -128,6 +138,26 @@ export default function CategoryLessonsPage({ params }: CategoryLessonsPageProps
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Not started yet</p>
+              )}
+              
+              {(lesson.additionalResources && lesson.additionalResources.length > 0) && (
+                <div className="mt-4 space-y-2">
+                  <h4 className="text-sm font-medium">Additional Resources</h4>
+                  <ul className="space-y-1">
+                    {lesson.additionalResources.map((resource, index) => (
+                      <li key={index}>
+                        <a 
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          {resource.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </CardContent>
             <CardFooter>
