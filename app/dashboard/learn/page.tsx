@@ -1,76 +1,55 @@
+'use client'
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { Search } from "lucide-react"
+import { Search, CheckCircle } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface Category {
+  id: string
+  title: string
+  description: string
+  progress: number
+  image: string
+}
 
 export default function LearnPage() {
-  const categories = [
-    {
-      id: "basic-greetings",
-      title: "Basic Greetings",
-      description: "Learn common greeting signs",
-      progress: 60,
-      image: "/basic_grettings.png",
-    },
-    {
-      id: "numbers-counting",
-      title: "Numbers & Counting",
-      description: "Master numbers from 1-20",
-      progress: 35,
-      image: "/numbers.jpg",
-    },
-    {
-      id: "common-phrases",
-      title: "Common Phrases",
-      description: "Everyday useful expressions",
-      progress: 15,
-      image: "/common_phrases.jpeg",
-    },
-    {
-      id: "family-relationships",
-      title: "Family & Relationships",
-      description: "Signs for family members and relationships",
-      progress: 0,
-      image: "/family_relationships.png",
-    },
-    {
-      id: "colors-descriptions",
-      title: "Colors & Descriptions",
-      description: "Visual descriptors and colors",
-      progress: 0,
-      image: "/colors.jpg",
-    },
-    {
-      id: "time-calendar",
-      title: "Time & Calendar",
-      description: "Days, months, and time expressions",
-      progress: 0,
-      image: "/time.jpg",
-    },
-    {
-      id: "food-dining",
-      title: "Food & Dining",
-      description: "Restaurant and food vocabulary",
-      progress: 0,
-      image: "/food.jpeg",
-    },
-    {
-      id: "travel-directions",
-      title: "Travel & Directions",
-      description: "Navigation and travel terminology",
-      progress: 0,
-      image: "/travel.jpeg",
-    },
-    {
-      id: "emotions-feelings",
-      title: "Emotions & Feelings",
-      description: "Express emotions and feelings",
-      progress: 0,
-      image: "/emotion.jpg",
-    },
-  ]
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/learn/category?id=all`, {
+          credentials: 'include',
+        })
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch categories')
+        }
+
+        const data = await res.json()
+        setCategories(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
 
   return (
     <div className="space-y-8">
@@ -88,8 +67,13 @@ export default function LearnPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((category) => (
-          <Card key={category.id} className="overflow-hidden">
+        {categories.map((category: Category) => (
+          <Card key={category.id} className="overflow-hidden relative">
+            {category.progress === 100 && (
+              <div className="absolute top-2 right-2 z-10">
+                <CheckCircle className="h-6 w-6 text-green-500" />
+              </div>
+            )}
             <div className="aspect-video w-full overflow-hidden">
               <img
                 src={category.image || "/placeholder.svg"}

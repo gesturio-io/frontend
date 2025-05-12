@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
 import { images } from "../Images/images"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface HeaderProps {
     showNavLinks?: boolean;
@@ -75,6 +76,7 @@ export function Header({ showNavLinks = true }: HeaderProps) {
                     {navigationLinks}
                 </nav>
                 <div className="hidden md:flex items-center gap-4">
+                    <ThemeToggle />
                     <Link href="/login">
                         <Button variant="outline" size="sm">
                             Log in
@@ -88,13 +90,16 @@ export function Header({ showNavLinks = true }: HeaderProps) {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button
-                    className="md:hidden p-2"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="Toggle menu"
-                >
-                    {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                </button>
+                <div className="flex md:hidden items-center gap-2">
+                    <ThemeToggle />
+                    <button
+                        className="p-2"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu */}

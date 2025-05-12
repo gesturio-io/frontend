@@ -12,6 +12,13 @@ interface UserProfile {
   profile_picture?: string;
   username: string;
   email: string;
+  bio?: string;
+  country?: string;
+  native_language?: string;
+  gender?: string;
+  date_of_birth?: string;
+  joined_at?: string;
+  daily_goal?: number;
 }
 
 export default function UserProfilePage() {
@@ -111,6 +118,59 @@ export default function UserProfilePage() {
       </h1>
       <div className="text-lg text-muted-foreground mb-1">Username: @{user.username}</div>
       <div className="text-lg mb-6">Email: {user.email}</div>
+      
+      {/* Additional user information */}
+      <div className="w-full space-y-4 text-left border-t pt-6">
+        {user.bio && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Bio</span>
+            <p className="text-base">{user.bio}</p>
+          </div>
+        )}
+        
+        {user.country && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Location</span>
+            <p className="text-base">{user.country}</p>
+          </div>
+        )}
+        
+        {user.native_language && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Native Language</span>
+            <p className="text-base">{user.native_language}</p>
+          </div>
+        )}
+        
+        {user.gender && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Gender</span>
+            <p className="text-base">{user.gender}</p>
+          </div>
+        )}
+        
+        {user.date_of_birth && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Date of Birth</span>
+            <p className="text-base">{new Date(user.date_of_birth).toLocaleDateString()}</p>
+          </div>
+        )}
+        
+        {user.joined_at && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Member Since</span>
+            <p className="text-base">{new Date(user.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+          </div>
+        )}
+        
+        {user.daily_goal && (
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-muted-foreground">Daily Goal</span>
+            <p className="text-base">{user.daily_goal} minutes</p>
+          </div>
+        )}
+      </div>
+
       {error && <div className="text-red-500 mb-2">{error}</div>}
       {isFriend === "accepted" ? (
         <div className="text-green-600 font-semibold mt-2">Friends</div>

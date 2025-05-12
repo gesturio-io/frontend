@@ -5,54 +5,17 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, BookOpen, CheckCircle, Play, Clock } from "lucide-react"
 
-export default function BasicGreetingsPage() {
-  const lessons = [
-    {
-      id: 1,
-      title: "Hello and Goodbye",
-      description: "Learn the most common greeting signs",
-      duration: "5 min",
-      completed: true,
-      image: "/basic_grettings.png",
-    },
-    {
-      id: 2,
-      title: "Thank You and Please",
-      description: "Essential polite expressions",
-      duration: "8 min",
-      completed: true,
-      image: "/basic_grettings.png",
-    },
-    {
-      id: 3,
-      title: "How are you?",
-      description: "Asking about well-being",
-      duration: "10 min",
-      completed: false,
-      image: "/basic_grettings.png",
-    },
-    {
-      id: 4,
-      title: "Nice to meet you",
-      description: "First-time meeting expressions",
-      duration: "12 min",
-      completed: false,
-      image: "/basic_grettings.png",
-    },
-    {
-      id: 5,
-      title: "Good morning/afternoon/evening",
-      description: "Time-based greetings",
-      duration: "15 min",
-      completed: false,
-      image: "/basic_grettings.png",
-    },
-  ]
+// Fetch lessons from the backend API
+export default async function BasicGreetingsPage() {
+  const res = await fetch("/api/learn/basic-greetings", { cache: "no-store" })
+  if (!res.ok) throw new Error("Failed to fetch lessons")
+  const data = await res.json()
+  const lessons = data.lessons || []
 
   // Calculate overall progress
-  const completedLessons = lessons.filter((lesson) => lesson.completed).length
+  const completedLessons = lessons.filter((lesson: any) => lesson.completed).length
   const totalLessons = lessons.length
-  const progressPercentage = Math.round((completedLessons / totalLessons) * 100)
+  const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
   return (
     <div className="space-y-8">
@@ -85,7 +48,7 @@ export default function BasicGreetingsPage() {
               <div className="text-sm text-muted-foreground">Total Lessons</div>
             </div>
             <div className="flex flex-col items-center justify-center rounded-lg border p-4">
-              <div className="text-3xl font-bold">50 min</div>
+              <div className="text-3xl font-bold">{lessons.reduce((acc: number, l: any) => acc + (parseInt(l.duration) || 0), 0)} min</div>
               <div className="text-sm text-muted-foreground">Total Duration</div>
             </div>
             <div className="flex flex-col items-center justify-center rounded-lg border p-4">
@@ -103,7 +66,7 @@ export default function BasicGreetingsPage() {
         </TabsList>
         <TabsContent value="lessons" className="mt-4">
           <div className="space-y-4">
-            {lessons.map((lesson) => (
+            {lessons.map((lesson: any) => (
               <Card
                 key={lesson.id}
                 className={lesson.completed ? "border-green-200 bg-green-50/30 dark:bg-green-900/10" : ""}
@@ -131,9 +94,11 @@ export default function BasicGreetingsPage() {
                       <CardDescription>{lesson.description}</CardDescription>
                     </CardHeader>
                     <CardFooter className="mt-auto p-0 pt-4">
-                      <Button className="gap-2">
-                        {lesson.completed ? "Review" : "Start"}
-                        <Play className="h-4 w-4" />
+                      <Button asChild className="gap-2">
+                        <Link href={`/dashboard/learn/basic-greetings/${lesson.id}`}>
+                          {lesson.completed ? "Review" : "Start"}
+                          <Play className="h-4 w-4" />
+                        </Link>
                       </Button>
                     </CardFooter>
                   </div>
