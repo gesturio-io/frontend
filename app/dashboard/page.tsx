@@ -8,6 +8,7 @@ import { Award, Calendar, Clock, Flame, HandMetal, TrendingUp } from "lucide-rea
 import { ProfileCompletionGuard } from "@/app/components/profile/ProfileCompletionGuard"
 import { useEffect, useState, useRef } from "react"
 import { logsService } from "@/lib/api"
+import Link from "next/link";
 
 type WeeklyActivity = {
   date: string
@@ -156,8 +157,10 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">Welcome back! Continue your learning journey.</p>
           </div>
-          <Button size="lg">Continue Learning</Button>
-        </div>
+          <Link href="/dashboard/learn">
+            <Button size="lg">Continue Learning</Button>
+          </Link>        
+          </div>
 
         {/* Weekly Practice Schedule */}
         <Card className="bg-background">
@@ -186,15 +189,14 @@ export default function DashboardPage() {
                         {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                       <div
-                        className={`mt-2 flex h-12 w-12 items-center justify-center rounded-full ${
-                          day.has_activity
+                        className={`mt-2 flex h-12 w-12 items-center justify-center rounded-full ${day.has_activity
                             ? "bg-primary text-primary-foreground"
                             : day.is_today
                               ? "border-2 border-primary"
                               : day.is_future
                                 ? "bg-muted"
                                 : "bg-muted"
-                        }`}
+                          }`}
                       >
                         {day.has_activity && <Flame className="h-5 w-5" />}
                         {day.is_today && !day.has_activity && <span className="h-2 w-2 rounded-full bg-primary"></span>}
@@ -262,9 +264,11 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Pick up where you left off</h2>
+            <Link href = "/dashboard/learn">
             <Button variant="outline" size="sm">
               View All
             </Button>
+            </Link>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {currentLessons.map((lesson) => (
@@ -301,9 +305,11 @@ export default function DashboardPage() {
               <TabsTrigger value="improve">Areas to Improve</TabsTrigger>
               <TabsTrigger value="trending">Trending Lessons</TabsTrigger>
             </TabsList>
+            <Link href = "/dashboard/practice">
             <Button variant="outline" size="sm">
               View All
             </Button>
+            </Link>
           </div>
           <TabsContent value="improve" className="mt-4 space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

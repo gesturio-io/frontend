@@ -67,12 +67,14 @@ export const PricingSection = () => {
                         </p>
                     </div>
                 </div>
-                <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-                    {pricingTiers.map((tier, index) => (
-                        <div
-                            key={index}
-                            className="flex flex-col justify-center space-y-4 rounded-lg border bg-background p-6 shadow-sm"
-                        >
+
+                <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+                {pricingTiers.map((tier, index) => (
+                    <div
+                        key={index}
+                        className="flex flex-col justify-between rounded-lg border bg-background p-6 shadow-sm min-h-[450px]"
+                    >
+                        <div className="space-y-4">
                             <div className="space-y-2">
                                 <h3 className="text-xl font-bold">{tier.name}</h3>
                                 <p className="text-muted-foreground">{tier.description}</p>
@@ -86,10 +88,16 @@ export const PricingSection = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <Button className="w-full">{tier.cta}</Button>
                         </div>
-                    ))}
-                </div>
+
+                        <div className="pt-2">
+                            <Button className="w-full">
+                                {tier.cta || "Get Started"}
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+            </div>
             </div>
         </section>
     )

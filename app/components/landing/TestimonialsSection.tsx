@@ -43,13 +43,13 @@ export const TestimonialsSection = () => {
                         </p>
                     </div>
                 </div>
-                <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+                <div className="mx-auto grid max-w-5xl items-stretch gap-6 py-12 lg:grid-cols-3 lg:gap-12">
                     {testimonials.map((testimonial, index) => (
                         <div
                             key={index}
-                            className="flex flex-col justify-center space-y-4 rounded-lg border bg-background p-6 shadow-sm"
+                            className="flex flex-col rounded-lg border bg-background p-6 shadow-sm h-full"
                         >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 mb-6">
                                 <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
                                     <span className="text-lg font-semibold">{testimonial.initials}</span>
                                 </div>
@@ -58,10 +58,13 @@ export const TestimonialsSection = () => {
                                     <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                                 </div>
                             </div>
-                            <p className="text-muted-foreground">{testimonial.quote}</p>
+
+                            <p className="text-muted-foreground mt-0">{testimonial.quote}</p>
                         </div>
                     ))}
                 </div>
+
+
             </div>
         </section>
     )
